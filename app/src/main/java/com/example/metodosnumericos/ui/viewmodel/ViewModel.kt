@@ -57,6 +57,9 @@ class MainViewModel : ViewModel() {
     var yEvaluado by mutableStateOf<Double?>(null)
         private set
 
+    var puntosGrafica by mutableStateOf<List<Punto>>(emptyList())
+        private set
+
     // =====================================================
     // DROPDOWN
     // =====================================================
@@ -124,6 +127,19 @@ class MainViewModel : ViewModel() {
     // LIMPIAR
     // =====================================================
 
+    fun reiniciar() {
+        puntos = listOf(
+            Punto(1.0, 2.0),
+            Punto(2.0, 4.0),
+            Punto(3.0, 8.0)
+        )
+        resultado = null
+        error = ""
+        xEvaluar = ""
+        yEvaluado = null
+        puntosGrafica = emptyList()
+    }
+
     fun limpiarError() {
 
         error = ""
@@ -132,6 +148,31 @@ class MainViewModel : ViewModel() {
     fun limpiarResultado() {
 
         resultado = null
+    }
+
+    private fun generarPuntosGrafica(polinomio: String) {
+        try {
+            val expr = polinomio.replace("**", "^").replace(" ", "")
+            val compiledExpr = ExpressionBuilder(expr).variable("x").build()
+
+            val minX = puntos.minOf { it.x }
+            val maxX = puntos.maxOf { it.x }
+            val range = maxX - minX
+            val step = if (range == 0.0) 0.1 else range / 50.0
+
+            val nuevosPuntos = mutableListOf<Punto>()
+            var currentX = minX - (range * 0.1) // Un poco antes del inicio
+            val endX = maxX + (range * 0.1) // Un poco después del final
+
+            while (currentX <= endX) {
+                val y = compiledExpr.setVariable("x", currentX).evaluate()
+                nuevosPuntos.add(Punto(currentX, y))
+                currentX += step
+            }
+            puntosGrafica = nuevosPuntos
+        } catch (e: Exception) {
+            puntosGrafica = emptyList()
+        }
     }
 
     // =====================================================
@@ -187,6 +228,9 @@ class MainViewModel : ViewModel() {
 
                 loading = true
                 error = ""
+                resultado = null
+                yEvaluado = null
+                puntosGrafica = emptyList()
 
                 // =========================================
                 // VALIDACIONES
@@ -245,6 +289,8 @@ class MainViewModel : ViewModel() {
                                 metodo = it.metodo,
                                 polinomio = it.polinomio
                             )
+                        
+                        generarPuntosGrafica(it.polinomio)
                     }
 
                 } else {

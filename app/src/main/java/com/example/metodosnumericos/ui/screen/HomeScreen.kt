@@ -144,24 +144,42 @@ fun MainScreen(
             // BOTÓN RESOLVER
             // =================================================
             item {
-                Button(
-                    onClick = { vm.resolver() },
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .height(56.dp),
-                    shape = RoundedCornerShape(12.dp),
-                    enabled = !vm.loading
-                ) {
-                    if (vm.loading) {
-                        CircularProgressIndicator(
-                            modifier = Modifier.size(24.dp),
-                            color = MaterialTheme.colorScheme.onPrimary,
-                            strokeWidth = 2.dp
+                Column(verticalArrangement = Arrangement.spacedBy(12.dp)) {
+                    Button(
+                        onClick = { vm.resolver() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        enabled = !vm.loading
+                    ) {
+                        if (vm.loading) {
+                            CircularProgressIndicator(
+                                modifier = Modifier.size(24.dp),
+                                color = MaterialTheme.colorScheme.onPrimary,
+                                strokeWidth = 2.dp
+                            )
+                        } else {
+                            Icon(Icons.Default.PlayArrow, null)
+                            Spacer(Modifier.width(8.dp))
+                            Text("Calcular Polinomio", fontSize = 16.sp)
+                        }
+                    }
+
+                    OutlinedButton(
+                        onClick = { vm.reiniciar() },
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(56.dp),
+                        shape = RoundedCornerShape(12.dp),
+                        border = androidx.compose.foundation.BorderStroke(
+                            1.dp,
+                            MaterialTheme.colorScheme.primary
                         )
-                    } else {
-                        Icon(Icons.Default.PlayArrow, null)
+                    ) {
+                        Icon(Icons.Default.Refresh, null)
                         Spacer(Modifier.width(8.dp))
-                        Text("Calcular Polinomio", fontSize = 16.sp)
+                        Text("Reiniciar", fontSize = 16.sp)
                     }
                 }
             }
@@ -389,6 +407,19 @@ fun MainScreen(
                     }
                 }
             }
+
+            // =================================================
+            // GRÁFICA
+            // =================================================
+            item {
+                AnimatedCard {
+                    GraficaView(
+                        puntosGrafica = vm.puntosGrafica
+                    )
+                }
+            }
+
+            // mostrar los integrantes del grupo.
 
             item {
                 Button(
